@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.env
+*.sqlite3
+.git
+.gitignore
+*.md
+.DS_Store
+node_modules/
+media/
+staticfiles/
+

@@ -1,0 +1,12 @@
+{
+  "include": [
+    "ecomerc_django"
+  ],
+  "extraPaths": [
+    "ecomerc_django",
+    "C:/Users/MONY/AppData/Local/Programs/Python/Python314/Lib/site-packages"
+  ],
+  "pythonPath": "C:/Users/MONY/AppData/Local/Programs/Python/Python314/python.exe",
+  "pythonVersion": "3.14",
+  "reportIncompatibleVariableOverride": false
+}

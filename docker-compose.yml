@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  # ─── Django Web App ─────────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: greatkart_web
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput --clear 2>/dev/null || true &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./ecomerc_django:/app
+      - media_volume:/app/media
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./ecomerc_django/.env
+    environment:
+      - DEBUG=True
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─── PostgreSQL Database ─────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: greatkart_db
+    environment:
+      POSTGRES_DB: greatkart
+      POSTGRES_USER: greatkart_user
+      POSTGRES_PASSWORD: greatkart_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U greatkart_user -d greatkart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  media_volume:
+  static_volume:
+
