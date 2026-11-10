@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProductCard } from '../product/ProductCard';
-import { products } from '../../data/products';
+import { api } from '../../services/api';
+import type { Product } from '../../types';
 import { motion } from 'framer-motion';
 
 export const TrendingProducts: React.FC = () => {
   const [activePage, setActivePage] = useState(0);
-  const trendingList = products.slice(0, 6);
+  const [trendingList, setTrendingList] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getProducts().then((data) => {
+      if (isMounted) {
+        setTrendingList(data.slice(0, 6));
+        setLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <section className="py-14 sm:py-20 bg-white border-t border-neutral-100">
@@ -19,19 +34,27 @@ export const TrendingProducts: React.FC = () => {
         </div>
 
         {/* 6 Products Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5"
-        >
-          {trendingList.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </motion.div>
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 animate-pulse">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="aspect-[4/5] bg-neutral-100 rounded-sm" />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5"
+          >
+            {trendingList.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </motion.div>
+        )}
 
-        {/* Carousel Indicators matching screenshot */}
+        {/* Carousel Indicators */}
         <div className="flex items-center justify-center gap-2 mt-10">
           {[0, 1, 2].map((idx) => (
             <button
@@ -48,4 +71,3 @@ export const TrendingProducts: React.FC = () => {
     </section>
   );
 };
-

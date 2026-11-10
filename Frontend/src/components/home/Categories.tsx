@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { categories } from '../../data/categories';
+import { api } from '../../services/api';
+import type { CategoryItem } from '../../types';
 
 export const Categories: React.FC = () => {
+  const [categoryList, setCategoryList] = useState<CategoryItem[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getCategories().then((data) => {
+      if (isMounted) setCategoryList(data);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section className="py-14 sm:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,7 +30,7 @@ export const Categories: React.FC = () => {
 
         {/* 5 Column Grid matching Screenshot */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {categories.map((cat, index) => (
+          {categoryList.slice(0, 5).map((cat, index) => (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, y: 20 }}
@@ -56,4 +69,3 @@ export const Categories: React.FC = () => {
     </section>
   );
 };
-

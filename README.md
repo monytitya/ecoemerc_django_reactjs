@@ -1,10 +1,10 @@
-# 🛒 GreatKart — Django E-Commerce Web Application
+# GreatKart — Django E-Commerce Web Application
 
 A full-featured e-commerce web application built with **Django 3.1**, featuring user authentication, product catalog, shopping cart, PayPal payment integration, AWS S3 media storage, and admin management.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
@@ -23,22 +23,22 @@ A full-featured e-commerce web application built with **Django 3.1**, featuring 
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
-| 🔐 **Custom Authentication** | Register, login, logout with email verification |
-| 👤 **User Dashboard** | Profile editing, order history, password change |
-| 🏷️ **Product Catalog** | Products with categories, variations (color/size), gallery images |
-| ⭐ **Reviews & Ratings** | Authenticated users can submit star ratings and reviews |
-| 🛒 **Shopping Cart** | Add, remove, update cart items with variation support |
-| 💳 **Checkout & Payment** | PayPal payment gateway integration |
-| 📦 **Order Management** | Order tracking with statuses: New → Accepted → Completed → Cancelled |
-| 📧 **Email Notifications** | Account verification emails, order confirmation emails |
-| 🔒 **Admin Honeypot** | Fake `/admin/` to trap unauthorized access; real admin at `/securelogin/` |
-| ⏱️ **Session Timeout** | Auto-logout after 1 hour of inactivity |
-| ☁️ **AWS S3 Storage** | Static & media files stored on Amazon S3 |
-| 🚀 **AWS Elastic Beanstalk** | Production deployment config included |
+|  **Custom Authentication** | Register, login, logout with email verification |
+|  **User Dashboard** | Profile editing, order history, password change |
+|  **Product Catalog** | Products with categories, variations (color/size), gallery images |
+|  **Reviews & Ratings** | Authenticated users can submit star ratings and reviews |
+|  **Shopping Cart** | Add, remove, update cart items with variation support |
+|  **Checkout & Payment** | PayPal payment gateway integration |
+|  **Order Management** | Order tracking with statuses: New → Accepted → Completed → Cancelled |
+|  **Email Notifications** | Account verification emails, order confirmation emails |
+|  **Admin Honeypot** | Fake `/admin/` to trap unauthorized access; real admin at `/securelogin/` |
+|  **Session Timeout** | Auto-logout after 1 hour of inactivity |
+|  **AWS S3 Storage** | Static & media files stored on Amazon S3 |
+|  **AWS Elastic Beanstalk** | Production deployment config included |
 
 ---
 
@@ -55,7 +55,7 @@ A full-featured e-commerce web application built with **Django 3.1**, featuring 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Python-Django/
@@ -90,7 +90,7 @@ Python-Django/
 
 ---
 
-## ✅ Prerequisites
+##  Prerequisites
 
 Make sure you have the following installed:
 
@@ -101,7 +101,7 @@ Make sure you have the following installed:
 
 ---
 
-## 🚀 Local Setup & Installation
+##  Local Setup & Installation
 
 ### 1. Clone the Repository
 
@@ -193,7 +193,7 @@ AWS_STORAGE_BUCKET_NAME=your-s3-bucket-name
 
 > **Tip for local development:** If you don't have AWS S3 set up yet, temporarily edit `settings.py` to use local static/media files instead (comment out the AWS block and uncomment the local static config).
 
-### 📧 Gmail App Password Setup
+###  Gmail App Password Setup
 
 1. Enable **2-Step Verification** on your Google account
 2. Go to **Google Account → Security → App passwords**
@@ -202,7 +202,7 @@ AWS_STORAGE_BUCKET_NAME=your-s3-bucket-name
 
 ---
 
-## ▶️ Running the Project
+##  Running the Project
 
 ```bash
 # From the ecomerc_django/ directory
@@ -213,7 +213,7 @@ Then open your browser at: **http://127.0.0.1:8000/**
 
 ---
 
-## 📦 Loading Sample Data
+##  Loading Sample Data
 
 The project includes a `data.json` fixture with sample categories and products:
 
@@ -223,7 +223,7 @@ python manage.py loaddata data.json
 
 ---
 
-## 🔐 Admin Panel
+##  Admin Panel
 
 | URL | Description |
 |---|---|
@@ -300,7 +300,7 @@ In the real admin panel you can:
 
 ---
 
-## ☁️ AWS S3 Configuration (Production)
+##  AWS S3 Configuration (Production)
 
 The project is pre-configured to serve static and media files from **Amazon S3**.
 
@@ -316,7 +316,7 @@ The project is pre-configured to serve static and media files from **Amazon S3**
 
 ---
 
-## 🌩️ Deploying to AWS Elastic Beanstalk
+##  Deploying to AWS Elastic Beanstalk
 
 The `.ebextensions/` folder contains two config files:
 
@@ -347,7 +347,7 @@ eb deploy
 
 ---
 
-## 🐛 Common Issues & Tips
+##  Common Issues & Tips
 
 ### `SECRET_KEY` not found
 Make sure your `.env` file exists in the same directory as `manage.py` (inside `ecomerc_django/`).
@@ -376,11 +376,11 @@ pip install psycopg2-binary
 
 ---
 
-## 📄 License
+##  License
 
 This project is for educational purposes. Feel free to use and modify it.
 
 ---
 
-*Built with ❤️ using Django*
+*Built with  using Django*
 

@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CartProvider, useCart } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import { AnnouncementBar } from './components/layout/AnnouncementBar';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/cart/CartDrawer';
+import { AuthModal } from './components/auth/AuthModal';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { Cart } from './pages/Cart';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { Overview } from './pages/Overview';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [query, setQuery] = useState('');
@@ -85,35 +100,55 @@ function Toast() {
   );
 }
 
-export function App() {
+function MainLayout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <CartProvider>
-      <Router>
-        <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans antialiased">
-          <AnnouncementBar />
-          <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
+    <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans antialiased">
+      <AnnouncementBar />
+      <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 
-          <main className="flex-1">
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/collections" element={<Shop />} />
+          <Route path="/product/:slug" element={<ProductDetailsPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </main>
+
+      <Footer />
+      <CartDrawer />
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <Toast />
+    </div>
+  );
+}
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>
+          <Router>
+            <AuthModal />
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/collections" element={<Shop />} />
-              <Route path="/product/:slug" element={<ProductDetailsPage />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
+              {/* Dashboard Standalone View matching Saledash spec */}
+              <Route path="/dashboard" element={<Overview />} />
+              <Route path="/dashboard/orders" element={<Overview />} />
+              <Route path="/dashboard/login" element={<Login />} />
+              {/* Storefront Layout */}
+              <Route path="/*" element={<MainLayout />} />
             </Routes>
-          </main>
-
-          <Footer />
-          <CartDrawer />
-          <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-          <Toast />
-        </div>
-      </Router>
-    </CartProvider>
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,25 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { Truck, ShieldCheck, Share2, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { Product } from '../types';
 
 export const ProductDetailsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addToCart } = useCart();
 
-  const product = products.find((p) => p.slug === slug) || products[0];
-  const [selectedSize, setSelectedSize] = useState<string>(product.sizes[0] || 'M');
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string>('M');
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(product.image);
+  const [activeImage, setActiveImage] = useState<string>('');
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (slug) {
+      setLoading(true);
+      api.getProductBySlug(slug).then((prod) => {
+        if (prod) {
+          setProduct(prod);
+          setSelectedSize(prod.sizes[0] || 'M');
+          setActiveImage(prod.image);
+        }
+        setLoading(false);
+      });
+    }
+  }, [slug]);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 animate-pulse text-left">
+        <div className="h-6 w-48 bg-neutral-100 mb-8" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="aspect-[4/5] bg-neutral-100 rounded-sm" />
+          <div className="space-y-4">
+            <div className="h-4 w-32 bg-neutral-100" />
+            <div className="h-8 w-64 bg-neutral-100" />
+            <div className="h-6 w-24 bg-neutral-100" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h2 className="text-xl font-bold uppercase">Product Not Found</h2>
+        <Link to="/shop" className="text-xs font-bold underline mt-4 block">
+          Return to Shop →
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 text-left">
@@ -70,7 +113,7 @@ export const ProductDetailsPage: React.FC = () => {
         <div className="space-y-6">
           <div>
             <span className="text-[10px] font-bold tracking-[0.25em] text-neutral-400 uppercase">
-              {product.categoryName} • THRIFT ARCHIVE
+              {product.categoryName} • NEVERMORE ARCHIVE
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase text-black mt-1">
               {product.name}
@@ -157,7 +200,7 @@ export const ProductDetailsPage: React.FC = () => {
           <div className="border border-neutral-200 bg-neutral-50/70 p-4 space-y-2 text-xs text-neutral-700">
             <div className="flex items-center gap-2">
               <Truck className="w-4 h-4 text-neutral-900" />
-              <span>Free standard shipping across India on orders over ₹1,499.</span>
+              <span>Free standard shipping on orders over ₹1,499.</span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-neutral-900" />

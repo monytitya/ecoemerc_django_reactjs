@@ -1,30 +1,46 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/product/ProductCard';
-import { products } from '../data/products';
+import { api } from '../services/api';
+import type { Product, CategoryItem } from '../types';
 import { Filter, SlidersHorizontal } from 'lucide-react';
 
 export const Shop: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
   const filterParam = searchParams.get('filter') || 'all';
+  const searchQuery = searchParams.get('search') || '';
+
+  const [productsList, setProductsList] = useState<Product[]>([]);
+  const [categoriesList, setCategoriesList] = useState<CategoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [sortBy, setSortBy] = useState<'featured' | 'low-high' | 'high-low'>('featured');
   const [selectedSize, setSelectedSize] = useState<string>('all');
 
-  const categories = [
-    { label: 'All Categories', slug: 'all' },
-    { label: 'Hoodies', slug: 'hoodies' },
-    { label: 'T-Shirts', slug: 't-shirts' },
-    { label: 'Pants', slug: 'pants' },
-    { label: 'Jackets', slug: 'jackets' },
-    { label: 'Accessories', slug: 'accessories' },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    Promise.all([
+      api.getCategories(),
+      api.getProducts(categoryParam !== 'all' ? categoryParam : undefined, searchQuery || undefined),
+    ]).then(([cats, prods]) => {
+      if (isMounted) {
+        setCategoriesList(cats);
+        setProductsList(prods);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [categoryParam, searchQuery]);
 
   const filteredProducts = useMemo(() => {
-    return products
+    return productsList
       .filter((p) => {
-        if (categoryParam !== 'all' && p.category !== categoryParam) return false;
         if (filterParam === 'new' && !p.tag?.includes('Trending')) return false;
         if (filterParam === 'sale' && !p.originalPrice) return false;
         if (selectedSize !== 'all' && !p.sizes.includes(selectedSize as any)) return false;
@@ -35,7 +51,7 @@ export const Shop: React.FC = () => {
         if (sortBy === 'high-low') return b.price - a.price;
         return 0;
       });
-  }, [categoryParam, filterParam, selectedSize, sortBy]);
+  }, [productsList, filterParam, selectedSize, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 text-left">
@@ -43,13 +59,13 @@ export const Shop: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-neutral-100 gap-4">
         <div>
           <span className="text-[10px] font-bold tracking-[0.25em] text-neutral-400 uppercase">
-            NEON ARCHIVE
+            NEON ARCHIVE • LIVE API
           </span>
           <h1 className="text-3xl font-black tracking-tight uppercase text-black mt-1">
-            {categoryParam === 'all' ? 'ALL PRODUCTS' : categoryParam.toUpperCase()}
+            {searchQuery ? `SEARCH: "${searchQuery}"` : categoryParam === 'all' ? 'ALL PRODUCTS' : categoryParam.toUpperCase()}
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Showing {filteredProducts.length} premium handpicked thrift garments
+            Showing {filteredProducts.length} items from Django REST API
           </p>
         </div>
 
@@ -85,9 +101,19 @@ export const Shop: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Pills Navigation */}
+      {/* Category Pills Navigation from API */}
       <div className="flex items-center gap-2 overflow-x-auto py-6 border-b border-neutral-100 scrollbar-none">
-        {categories.map((c) => (
+        <button
+          onClick={() => setSearchParams({ category: 'all' })}
+          className={`px-4 py-2 text-xs font-bold tracking-widest uppercase transition whitespace-nowrap ${
+            categoryParam === 'all'
+              ? 'bg-black text-white'
+              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+        >
+          All Categories
+        </button>
+        {categoriesList.map((c) => (
           <button
             key={c.slug}
             onClick={() => setSearchParams({ category: c.slug })}
@@ -97,17 +123,23 @@ export const Shop: React.FC = () => {
                 : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
             }`}
           >
-            {c.label}
+            {c.name}
           </button>
         ))}
       </div>
 
       {/* Products Grid */}
       <div className="pt-10">
-        {filteredProducts.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 animate-pulse">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="aspect-[4/5] bg-neutral-100 rounded-sm" />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="py-20 text-center text-neutral-400 space-y-2">
             <p className="text-sm font-bold uppercase tracking-wider">No products found</p>
-            <p className="text-xs">Try selecting a different category or resetting filters.</p>
+            <p className="text-xs">Try selecting a different category or clearing your search.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -120,4 +152,3 @@ export const Shop: React.FC = () => {
     </div>
   );
 };
-
